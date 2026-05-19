@@ -18,7 +18,7 @@ WORKDIR /app
 
 # Copia todas as dependências (dev + prod) para o build
 COPY package.json ./
-RUN npm install --no-audit --no-fund
+RUN npm install --include=dev --no-audit --no-fund
 
 # Copia o restante do código
 COPY . .

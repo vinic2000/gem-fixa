@@ -5,9 +5,9 @@ FROM node:22-alpine AS deps
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 
-RUN npm ci --omit=dev
+RUN npm install --omit=dev --no-audit --no-fund
 
 # =============================================================
 # Stage 2 — builder: compila a aplicação Next.js
@@ -17,8 +17,8 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 
 # Copia todas as dependências (dev + prod) para o build
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install --no-audit --no-fund
 
 # Copia o restante do código
 COPY . .

@@ -14,8 +14,8 @@ export interface RefreshTokenPayload {
   jti: string
 }
 
-export interface DecodedAccessToken extends AccessTokenPayload, JwtPayload {}
-export interface DecodedRefreshToken extends RefreshTokenPayload, JwtPayload {}
+export type DecodedAccessToken = AccessTokenPayload & Omit<JwtPayload, 'sub' | 'jti'>
+export type DecodedRefreshToken = RefreshTokenPayload & Omit<JwtPayload, 'sub' | 'jti'>
 
 /**
  * Gera um access token com expiração de 1 hora.

@@ -55,7 +55,7 @@ export const PessoaService = {
 
     if (!pessoa) throw new Error('Pessoa não encontrada')
 
-    const dadosAntes = pessoa.get({ plain: true }) as Record<string, unknown>
+    const dadosAntes = pessoa.get({ plain: true }) as unknown as Record<string, unknown>
 
     const { senha, ...dadosLimpos } = dados as any
     if (senha) dadosLimpos.senha_hash = await bcrypt.hash(senha, 10)

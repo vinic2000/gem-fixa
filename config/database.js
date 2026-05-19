@@ -1,5 +1,13 @@
 require('dotenv').config()
 
+// SSL é desativado por padrão em ambientes Docker internos.
+// Defina DB_SSL=true nas variáveis de ambiente para habilitar.
+const sslEnabled = process.env.DB_SSL === 'true'
+
+const sslOptions = sslEnabled
+  ? { ssl: { require: true, rejectUnauthorized: false } }
+  : {}
+
 module.exports = {
   development: {
     username: process.env.DB_USER || 'postgres',
@@ -28,10 +36,7 @@ module.exports = {
     dialect: 'postgres',
     logging: false,
     dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
+      ...sslOptions,
     },
   },
 }

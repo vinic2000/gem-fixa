@@ -30,6 +30,7 @@ Dockerfile
 .dockerignore
 docker-compose.yml
 docker/
+# entrypoint.sh é necessário no build — não ignorar
 
 # OS
 .DS_Store

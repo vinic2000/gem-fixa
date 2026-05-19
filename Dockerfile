@@ -62,7 +62,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.sequelizerc      ./.sequelizerc
 COPY --from=deps    --chown=nextjs:nodejs /app/node_modules      ./node_modules
 
 # Entrypoint: aguarda o banco, roda migrations e inicia o servidor
-COPY --chown=nextjs:nodejs docker/entrypoint.sh ./entrypoint.sh
+COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
 USER nextjs

@@ -3,35 +3,30 @@
 # =============================================================
 FROM node:22-alpine AS deps
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY package.json package-lock.json ./
 
-RUN pnpm install --frozen-lockfile --prod
+RUN npm ci --omit=dev
 
 # =============================================================
 # Stage 2 — builder: compila a aplicação Next.js
 # =============================================================
 FROM node:22-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 WORKDIR /app
 
 # Copia todas as dependências (dev + prod) para o build
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # Copia o restante do código
 COPY . .
 
-# Variáveis de build (valores placeholder — serão sobrescritas em runtime)
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN pnpm build
+RUN npm run build
 
 # =============================================================
 # Stage 3 — runner: imagem final mínima de produção
@@ -58,7 +53,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/lib/db/seeders    ./lib/db/seeder
 COPY --from=builder --chown=nextjs:nodejs /app/config            ./config
 COPY --from=builder --chown=nextjs:nodejs /app/.sequelizerc      ./.sequelizerc
 
-# Copia node_modules completo para as dependências nativas (sequelize, pg, etc.)
+# Copia node_modules com dependências nativas (sequelize, pg, etc.)
 COPY --from=deps    --chown=nextjs:nodejs /app/node_modules      ./node_modules
 
 # Entrypoint: aguarda o banco, roda migrations e inicia o servidor

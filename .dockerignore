@@ -1,7 +1,5 @@
 # Dependências
 node_modules
-.pnp
-.pnp.*
 
 # Build outputs
 .next
@@ -31,6 +29,11 @@ Dockerfile
 docker-compose.yml
 docker/
 # entrypoint.sh é necessário no build — não ignorar
+
+# pnpm (não usado em produção)
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.npmrc
 
 # OS
 .DS_Store

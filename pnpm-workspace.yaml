@@ -1,3 +1,6 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+policies:
+  minimumReleaseAge: '0 seconds'

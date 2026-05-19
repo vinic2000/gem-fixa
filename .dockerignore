@@ -1,0 +1,40 @@
+# Dependências
+node_modules
+.pnp
+.pnp.*
+
+# Build outputs
+.next
+out
+build
+coverage
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# Dev tooling
+.eslintcache
+*.tsbuildinfo
+
+# Testes
+test
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

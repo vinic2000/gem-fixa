@@ -12,6 +12,8 @@ const config: Config = {
   collectCoverageFrom: [
     'services/**/*.ts',
     'lib/**/*.ts',
+    '!lib/db/**',
+    '!lib/db/models/**',
     '!lib/db/migrations/**',
     '!lib/db/seeders/**',
   ],

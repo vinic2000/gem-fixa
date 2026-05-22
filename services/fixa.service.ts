@@ -2,6 +2,7 @@ import { Fixa, FixaAttributes, Pessoa } from '@/lib/db/models'
 
 type CriarFixaDTO = Omit<FixaAttributes, 'id' | 'created_at' | 'updated_at'>
 type AtualizarFixaDTO = Partial<Omit<FixaAttributes, 'id' | 'aluno_id' | 'created_at' | 'updated_at'>>
+type FixaFilter = { aluno_id: string; tipo_aula?: 'pratica' | 'teorica' }
 
 export const FixaService = {
   /**
@@ -21,7 +22,7 @@ export const FixaService = {
     tipoAula?: 'pratica' | 'teorica' | null
   ): Promise<{ count: number; rows: Fixa[] }> {
     const offset = (page - 1) * limit
-    const where: Record<string, any> = { aluno_id: alunoId }
+    const where: FixaFilter = { aluno_id: alunoId }
     if (tipoAula) where.tipo_aula = tipoAula
 
     return Fixa.findAndCountAll({

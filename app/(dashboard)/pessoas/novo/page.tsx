@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, Save, Loader2 } from 'lucide-react'
+import { getErrorMessage } from '@/lib/errors'
 
 interface PessoaForm {
   nome: string; sobrenome: string; tipo: string; email: string
@@ -47,8 +48,8 @@ export default function NovaPessoaPage() {
       await apiFetch('/api/pessoas', { method: 'POST', body: JSON.stringify(payload) })
       setSuccess('Pessoa cadastrada com sucesso!')
       setTimeout(() => router.push('/pessoas'), 1200)
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao salvar')
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Erro ao salvar'))
     } finally {
       setSaving(false)
     }

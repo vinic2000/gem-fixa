@@ -34,6 +34,9 @@ Regras práticas de TDD:
 - Definir constraints (PK, FK, UNIQUE, NOT NULL) sempre que aplicável.
 - Criar índices para consultas críticas.
 - Nunca alterar schema manualmente em produção sem migration.
+- Regra de negócio: não usar `onDelete` para apagar `fixa` automaticamente ao excluir `pessoas`.
+- Se pessoa (tipo `aluno`) tiver vínculo em `fixa`, excluir as fixas manualmente e depois excluir a pessoa.
+- Se pessoa for `instrutor`, permitir exclusão da entidade `pessoas` mantendo `fixa`.
 
 ## 6) Testes
 - Priorizar testes unitários e complementar com integração.
@@ -52,6 +55,7 @@ Regras práticas de TDD:
 - Logs úteis, sem vazar dados sensíveis.
 - Mensagens de erro claras para suporte e debugging.
 - Documentar decisões arquiteturais relevantes.
+- Regra obrigatória: logs (ex.: `audit_log`, `login_log`) devem ser sempre mantidos; nunca excluir logs ao excluir qualquer entidade de negócio.
 
 ## 9) Convenções de trabalho
 - Commits pequenos e objetivos.

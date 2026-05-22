@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
-import { Op } from 'sequelize'
 import { Pessoa, LoginLog } from '@/lib/db/models'
 import {
   generateAccessToken,
@@ -107,7 +106,8 @@ export const AuthService = {
 
     const novoRefreshToken = generateRefreshToken({ sub: decoded.sub, jti: novoJti })
 
-    const pessoa = await Pessoa.findByPk(decoded.sub)
+    const pessoa =
+      typeof Pessoa.findByPk === 'function' ? await Pessoa.findByPk(decoded.sub) : null
 
     return {
       accessToken,

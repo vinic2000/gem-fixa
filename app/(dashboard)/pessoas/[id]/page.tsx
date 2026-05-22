@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
+import { useAuth } from '@/lib/providers/auth-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,6 +15,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { ArrowLeft, Save, Loader2, Trash2 } from 'lucide-react'
+import { getErrorMessage } from '@/lib/errors'
 
 interface PessoaForm {
   nome: string
@@ -32,6 +34,8 @@ interface PessoaForm {
   senha: string
 }
 
+type PessoaApiResponse = Omit<PessoaForm, 'senha'>
+
 const EMPTY: PessoaForm = {
   nome: '', sobrenome: '', tipo: 'aluno', email: '',
   responsavel: '', telefone: '', celular: '', endereco: '',
@@ -42,6 +46,7 @@ const EMPTY: PessoaForm = {
 export default function PessoaFormPage() {
   const { id } = useParams<{ id: string }>()
   const router  = useRouter()
+  const { instrutor, logout } = useAuth()
   const isNovo  = id === 'novo'
 
   const [form, setForm]       = useState<PessoaForm>(EMPTY)
@@ -52,7 +57,7 @@ export default function PessoaFormPage() {
 
   useEffect(() => {
     if (isNovo) return
-    apiFetch(`/api/pessoas/${id}`)
+    apiFetch<PessoaApiResponse>(`/api/pessoas/${id}`)
       .then((p) => {
         setForm({
           nome:              p.nome              ?? '',
@@ -82,9 +87,13 @@ export default function PessoaFormPage() {
   async function handleDelete() {
     try {
       await apiFetch(`/api/pessoas/${id}`, { method: 'DELETE' })
+      if (instrutor?.id === id) {
+        logout()
+        return
+      }
       router.push('/pessoas')
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao excluir')
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Erro ao excluir'))
     }
   }
 
@@ -108,8 +117,8 @@ export default function PessoaFormPage() {
         await apiFetch(`/api/pessoas/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
         setSuccess('Dados atualizados com sucesso!')
       }
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao salvar')
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Erro ao salvar'))
     } finally {
       setSaving(false)
     }
@@ -153,6 +162,11 @@ export default function PessoaFormPage() {
                 <AlertDialogDescription>
                   Tem certeza que deseja excluir <strong>{form.nome} {form.sobrenome}</strong>?
                   Esta ação não pode ser desfeita e todos os dados vinculados serão perdidos.
+                  {form.tipo === 'aluno' && (
+                    <span className="block mt-2 font-medium text-gray-800">
+                      Aviso: ao excluir um aluno, as aulas fixas vinculadas também serão excluídas.
+                    </span>
+                  )}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

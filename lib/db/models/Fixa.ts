@@ -14,8 +14,10 @@ export interface FixaAttributes {
   updated_at?: Date
 }
 
-export interface FixaCreationAttributes
-  extends Optional<FixaAttributes, 'id' | 'created_at' | 'updated_at'> {}
+export type FixaCreationAttributes = Optional<
+  FixaAttributes,
+  'id' | 'created_at' | 'updated_at'
+>
 
 class Fixa
   extends Model<FixaAttributes, FixaCreationAttributes>

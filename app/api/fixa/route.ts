@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/middleware/auth'
 import { FixaService } from '@/services/fixa.service'
+import { getErrorMessage } from '@/lib/errors'
 
 // GET /api/fixa?aluno_id=uuid&page=1&limit=10&tipo_aula=pratica
 export const GET = withAuth(async (req: NextRequest) => {
@@ -66,9 +67,10 @@ export const POST = withAuth(async (req: NextRequest) => {
 
     const fixa = await FixaService.criar(body)
     return NextResponse.json(fixa, { status: 201 })
-  } catch (err: any) {
-    if (err.message === 'Aluno não encontrado' || err.message === 'O ID informado não pertence a um aluno') {
-      return NextResponse.json({ error: err.message }, { status: 400 })
+  } catch (err: unknown) {
+    const message = getErrorMessage(err, 'Erro interno do servidor')
+    if (message === 'Aluno não encontrado' || message === 'O ID informado não pertence a um aluno') {
+      return NextResponse.json({ error: message }, { status: 400 })
     }
     console.error('[POST /api/fixa]', err)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })

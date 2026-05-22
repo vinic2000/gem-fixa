@@ -3,7 +3,8 @@ import sequelize from '../index'
 
 export interface LoginLogAttributes {
   id: string
-  usuario_id: string
+  usuario_id: string | null
+  usuario_id_legado?: string | null
   login_at: Date
   logout_at?: Date | null
   token_jti: string
@@ -12,18 +13,18 @@ export interface LoginLogAttributes {
   updated_at?: Date
 }
 
-export interface LoginLogCreationAttributes
-  extends Optional<
-    LoginLogAttributes,
-    'id' | 'login_at' | 'logout_at' | 'created_at' | 'updated_at'
-  > {}
+export type LoginLogCreationAttributes = Optional<
+  LoginLogAttributes,
+  'id' | 'login_at' | 'logout_at' | 'created_at' | 'updated_at'
+>
 
 class LoginLog
   extends Model<LoginLogAttributes, LoginLogCreationAttributes>
   implements LoginLogAttributes
 {
   declare id: string
-  declare usuario_id: string
+  declare usuario_id: string | null
+  declare usuario_id_legado: string | null
   declare login_at: Date
   declare logout_at: Date | null
   declare token_jti: string
@@ -46,8 +47,12 @@ LoginLog.init(
     },
     usuario_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
       references: { model: 'pessoas', key: 'id' },
+    },
+    usuario_id_legado: {
+      type: DataTypes.UUID,
+      allowNull: true,
     },
     login_at: {
       type: DataTypes.DATE,

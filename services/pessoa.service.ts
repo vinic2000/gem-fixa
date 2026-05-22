@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { Pessoa, PessoaAttributes } from '@/lib/db/models'
+import { AuditLog, Fixa, LoginLog, Pessoa, PessoaAttributes } from '@/lib/db/models'
 import { registrarAudit, calcularDiff } from './log.service'
 
 type CriarPessoaDTO = Omit<PessoaAttributes, 'id' | 'created_at' | 'updated_at'> & { senha?: string }
@@ -34,7 +34,7 @@ export const PessoaService = {
    * Cria uma nova pessoa. Audita como 'cadastro'.
    */
   async criar(dados: CriarPessoaDTO, usuarioId: string): Promise<Pessoa> {
-    const { senha, ...rest } = dados as any
+    const { senha, ...rest } = dados
     if (senha) rest.senha_hash = await bcrypt.hash(senha, 10)
     const pessoa = await Pessoa.create(rest)
 
@@ -57,7 +57,7 @@ export const PessoaService = {
 
     const dadosAntes = pessoa.get({ plain: true }) as unknown as Record<string, unknown>
 
-    const { senha, ...dadosLimpos } = dados as any
+    const { senha, ...dadosLimpos } = dados
     if (senha) dadosLimpos.senha_hash = await bcrypt.hash(senha, 10)
 
     await Pessoa.update(dadosLimpos, { where: { id } })
@@ -84,8 +84,22 @@ export const PessoaService = {
 
     if (!pessoa) throw new Error('Pessoa não encontrada')
 
+    if (pessoa.tipo === 'aluno') {
+      await Fixa.destroy({ where: { aluno_id: id } })
+    }
+
+    await LoginLog.update(
+      { usuario_id: null, usuario_id_legado: id },
+      { where: { usuario_id: id } }
+    )
+    await AuditLog.update(
+      { usuario_id: null, usuario_id_legado: id },
+      { where: { usuario_id: id } }
+    )
     await pessoa.destroy()
 
-    await registrarAudit({ acao: 'exclusao', usuario_id: usuarioId, entidade_id: id })
+    if (usuarioId !== id) {
+      await registrarAudit({ acao: 'exclusao', usuario_id: usuarioId, entidade_id: id })
+    }
   },
 }

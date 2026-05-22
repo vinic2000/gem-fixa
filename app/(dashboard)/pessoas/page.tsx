@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { UserPlus, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { getErrorMessage } from '@/lib/errors'
 
 interface Pessoa {
   id: string
@@ -42,24 +43,32 @@ export default function PessoasPage() {
   const [searchInput, setSearchInput] = useState('')
   const [loading, setLoading]     = useState(false)
 
-  const fetchPessoas = useCallback(async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) })
-      if (tipo !== 'todos') params.set('tipo', tipo)
-      if (search)           params.set('search', search)
-      const res = await apiFetch<PessoasResponse>(`/api/pessoas?${params}`)
-      setPessoas(res.data)
-      setTotal(res.total)
-      setTotalPages(res.totalPages)
-    } catch (err: any) {
-      console.error(err)
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    let isCancelled = false
+
+    async function loadPessoas() {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams({ page: String(page), limit: String(LIMIT) })
+        if (tipo !== 'todos') params.set('tipo', tipo)
+        if (search) params.set('search', search)
+        const res = await apiFetch<PessoasResponse>(`/api/pessoas?${params}`)
+        if (isCancelled) return
+        setPessoas(res.data)
+        setTotal(res.total)
+        setTotalPages(res.totalPages)
+      } catch (err: unknown) {
+        console.error(getErrorMessage(err, 'Falha ao carregar pessoas'))
+      } finally {
+        if (!isCancelled) setLoading(false)
+      }
+    }
+
+    void loadPessoas()
+    return () => {
+      isCancelled = true
     }
   }, [page, tipo, search])
-
-  useEffect(() => { fetchPessoas() }, [fetchPessoas])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -145,7 +154,7 @@ export default function PessoasPage() {
                 <tr
                   key={p.id}
                   onClick={() => router.push(`/pessoas/${p.id}`)}
-                  className="border-b border-gray-50 hover:bg-blue-50 cursor-pointer transition-colors"
+                  className="border-b border-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
                 >
                   <td className="px-4 py-3 font-medium text-gray-900">
                     {p.nome} {p.sobrenome}

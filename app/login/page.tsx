@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Music } from 'lucide-react'
+import { getErrorMessage } from '@/lib/errors'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -21,8 +22,8 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(email, senha)
-    } catch (err: any) {
-      setError(err.message ?? 'Erro ao fazer login')
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, 'Erro ao fazer login'))
     } finally {
       setLoading(false)
     }
@@ -33,7 +34,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
+          <div className="w-14 h-14 bg-gray-800 border border-gray-900 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
             <Music className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Gem Fixa</h1>

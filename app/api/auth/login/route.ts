@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '@/services/auth.service'
+import { getErrorMessage } from '@/lib/errors'
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,9 +22,10 @@ export async function POST(req: NextRequest) {
     const result = await AuthService.login(email, senha, ipAddress)
 
     return NextResponse.json(result, { status: 200 })
-  } catch (err: any) {
-    if (err.message === 'Credenciais inválidas' || err.message === 'Acesso negado') {
-      return NextResponse.json({ error: err.message }, { status: 401 })
+  } catch (err: unknown) {
+    const message = getErrorMessage(err, 'Erro interno do servidor')
+    if (message === 'Credenciais inválidas' || message === 'Acesso negado') {
+      return NextResponse.json({ error: message }, { status: 401 })
     }
     console.error('[POST /api/auth/login]', err)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })

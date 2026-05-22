@@ -41,7 +41,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-700">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center shrink-0 border border-gray-700">
             <Music className="w-4 h-4 text-white" />
           </div>
           <span className="font-semibold text-sm flex-1">Gem Fixa</span>
@@ -66,7 +66,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                   active
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-gray-800 text-white border border-gray-700'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 )}
               >

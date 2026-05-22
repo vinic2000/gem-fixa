@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Op } from 'sequelize'
+import { Op, WhereOptions } from 'sequelize'
 import { withAuth } from '@/lib/middleware/auth'
 import { PessoaService } from '@/services/pessoa.service'
-import { Pessoa } from '@/lib/db/models'
+import { Pessoa, PessoaAttributes } from '@/lib/db/models'
 
 // GET /api/pessoas?page=1&limit=10&tipo=aluno&search=nome
 export const GET = withAuth(async (req: NextRequest, user) => {
@@ -14,13 +14,16 @@ export const GET = withAuth(async (req: NextRequest, user) => {
     const search  = searchParams.get('search') // busca por nome (autocomplete)
     const offset  = (page - 1) * limit
 
-    const where: Record<string, any> = {}
-    if (tipo && ['aluno', 'instrutor'].includes(tipo)) where.tipo = tipo
-    if (search) {
-      where[Op.or as any] = [
-        { nome:      { [Op.iLike]: `%${search}%` } },
-        { sobrenome: { [Op.iLike]: `%${search}%` } },
-      ]
+    const where: WhereOptions<PessoaAttributes> = {
+      ...(tipo && ['aluno', 'instrutor'].includes(tipo) ? { tipo } : {}),
+      ...(search
+        ? {
+            [Op.or]: [
+              { nome: { [Op.iLike]: `%${search}%` } },
+              { sobrenome: { [Op.iLike]: `%${search}%` } },
+            ],
+          }
+        : {}),
     }
 
     const { count, rows } = await Pessoa.findAndCountAll({
@@ -70,7 +73,7 @@ export const POST = withAuth(async (req: NextRequest, user) => {
 
     const pessoa = await PessoaService.criar(body, user.sub)
     return NextResponse.json(pessoa, { status: 201 })
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[POST /api/pessoas]', err)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
   }

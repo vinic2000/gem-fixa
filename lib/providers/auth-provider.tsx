@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { setTokens, clearTokens, getTokens } from '@/lib/api'
 
@@ -21,18 +21,19 @@ const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const [instrutor, setInstrutor] = useState<Instrutor | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  // Restaura sessão do localStorage no mount
-  useEffect(() => {
+  const [instrutor, setInstrutor] = useState<Instrutor | null>(() => {
+    if (typeof window === 'undefined') return null
     const { accessToken } = getTokens()
     const stored = localStorage.getItem('instrutor')
-    if (accessToken && stored) {
-      try { setInstrutor(JSON.parse(stored)) } catch { clearTokens() }
+    if (!accessToken || !stored) return null
+    try {
+      return JSON.parse(stored) as Instrutor
+    } catch {
+      clearTokens()
+      return null
     }
-    setIsLoading(false)
-  }, [])
+  })
+  const [isLoading] = useState(false)
 
   async function login(email: string, senha: string) {
     const res = await fetch('/api/auth/login', {

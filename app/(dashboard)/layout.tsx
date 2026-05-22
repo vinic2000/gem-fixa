@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-500 rounded-md flex items-center justify-center">
+            <div className="w-6 h-6 bg-gray-800 rounded-md border border-gray-700 flex items-center justify-center">
               <Music className="w-3 h-3 text-white" />
             </div>
             <span className="font-semibold text-sm text-gray-900">Gem Fixa</span>

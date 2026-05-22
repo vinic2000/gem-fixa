@@ -9,10 +9,10 @@ export interface AuthenticatedRequest extends NextRequest {
  * Verifica o JWT do header Authorization: Bearer <token>.
  * Retorna o payload decodificado ou NextResponse de erro.
  */
-export function withAuth(
-  handler: (req: NextRequest, user: DecodedAccessToken, context?: any) => Promise<NextResponse>
+export function withAuth<TContext = unknown>(
+  handler: (req: NextRequest, user: DecodedAccessToken, context: TContext) => Promise<NextResponse>
 ) {
-  return async (req: NextRequest, context?: any): Promise<NextResponse> => {
+  return async (req: NextRequest, context: TContext): Promise<NextResponse> => {
     const authHeader = req.headers.get('authorization')
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

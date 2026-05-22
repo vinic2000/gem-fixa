@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 require('dotenv').config()
 
 // SSL é desativado por padrão em ambientes Docker internos.

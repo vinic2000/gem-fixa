@@ -1,6 +1,5 @@
 import { PessoaService } from '@/services/pessoa.service'
-import { Pessoa } from '@/lib/db/models'
-import { AuditLog } from '@/lib/db/models'
+import { AuditLog, Fixa, LoginLog, Pessoa } from '@/lib/db/models'
 
 jest.mock('@/lib/db/models', () => ({
   Pessoa: {
@@ -12,6 +11,13 @@ jest.mock('@/lib/db/models', () => ({
   },
   AuditLog: {
     create: jest.fn(),
+    update: jest.fn(),
+  },
+  Fixa: {
+    destroy: jest.fn(),
+  },
+  LoginLog: {
+    update: jest.fn(),
   },
 }))
 
@@ -97,15 +103,55 @@ describe('PessoaService - atualizar', () => {
 })
 
 describe('PessoaService - deletar', () => {
-  it('deve deletar pessoa e registrar audit log', async () => {
-    const pessoa = { id: 'uuid-1', nome: 'João', destroy: jest.fn() }
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('deve excluir fixas vinculadas ao excluir aluno', async () => {
+    const pessoa = { id: 'uuid-1', tipo: 'aluno', destroy: jest.fn() }
     ;(Pessoa.findByPk as jest.Mock).mockResolvedValue(pessoa)
 
     await PessoaService.deletar('uuid-1', mockInstrutor.id)
 
+    expect(Fixa.destroy).toHaveBeenCalledWith(expect.objectContaining({ where: { aluno_id: 'uuid-1' } }))
+    expect(LoginLog.update).toHaveBeenCalledWith(
+      expect.objectContaining({ usuario_id: null, usuario_id_legado: 'uuid-1' }),
+      expect.objectContaining({ where: { usuario_id: 'uuid-1' } })
+    )
+    expect(AuditLog.update).toHaveBeenCalledWith(
+      expect.objectContaining({ usuario_id: null, usuario_id_legado: 'uuid-1' }),
+      expect.objectContaining({ where: { usuario_id: 'uuid-1' } })
+    )
+    expect(pessoa.destroy).toHaveBeenCalled()
+  })
+
+  it('deve deletar pessoa e registrar audit log', async () => {
+    const pessoa = { id: 'uuid-1', nome: 'João', tipo: 'instrutor', destroy: jest.fn() }
+    ;(Pessoa.findByPk as jest.Mock).mockResolvedValue(pessoa)
+
+    await PessoaService.deletar('uuid-1', mockInstrutor.id)
+
+    expect(Fixa.destroy).not.toHaveBeenCalled()
+    expect(LoginLog.update).toHaveBeenCalledWith(
+      expect.objectContaining({ usuario_id: null, usuario_id_legado: 'uuid-1' }),
+      expect.objectContaining({ where: { usuario_id: 'uuid-1' } })
+    )
+    expect(AuditLog.update).toHaveBeenCalledWith(
+      expect.objectContaining({ usuario_id: null, usuario_id_legado: 'uuid-1' }),
+      expect.objectContaining({ where: { usuario_id: 'uuid-1' } })
+    )
     expect(pessoa.destroy).toHaveBeenCalled()
     expect(AuditLog.create).toHaveBeenCalledWith(
       expect.objectContaining({ acao: 'exclusao', entidade_id: 'uuid-1' })
     )
+  })
+
+  it('não deve registrar audit de exclusão quando usuário exclui a própria conta', async () => {
+    const pessoa = { id: 'uuid-1', nome: 'João', tipo: 'instrutor', destroy: jest.fn() }
+    ;(Pessoa.findByPk as jest.Mock).mockResolvedValue(pessoa)
+
+    await PessoaService.deletar('uuid-1', 'uuid-1')
+
+    expect(AuditLog.create).not.toHaveBeenCalled()
   })
 })

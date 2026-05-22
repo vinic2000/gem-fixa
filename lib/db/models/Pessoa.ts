@@ -23,8 +23,10 @@ export interface PessoaAttributes {
   updated_at?: Date
 }
 
-export interface PessoaCreationAttributes
-  extends Optional<PessoaAttributes, 'id' | 'created_at' | 'updated_at'> {}
+export type PessoaCreationAttributes = Optional<
+  PessoaAttributes,
+  'id' | 'created_at' | 'updated_at'
+>
 
 class Pessoa
   extends Model<PessoaAttributes, PessoaCreationAttributes>

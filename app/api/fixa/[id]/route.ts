@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/middleware/auth'
 import { FixaService } from '@/services/fixa.service'
+import { getErrorMessage } from '@/lib/errors'
 
 type Context = { params: Promise<{ id: string }> }
 
@@ -10,9 +11,10 @@ export const GET = withAuth(async (_req: NextRequest, _user, context: Context) =
     const { id } = await context.params
     const fixa = await FixaService.buscarPorId(id)
     return NextResponse.json(fixa, { status: 200 })
-  } catch (err: any) {
-    if (err.message === 'Aula não encontrada') {
-      return NextResponse.json({ error: err.message }, { status: 404 })
+  } catch (err: unknown) {
+    const message = getErrorMessage(err, 'Erro interno do servidor')
+    if (message === 'Aula não encontrada') {
+      return NextResponse.json({ error: message }, { status: 404 })
     }
     console.error('[GET /api/fixa/[id]]', err)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
@@ -26,9 +28,10 @@ export const PUT = withAuth(async (req: NextRequest, _user, context: Context) =>
     const body = await req.json()
     const fixa = await FixaService.atualizar(id, body)
     return NextResponse.json(fixa, { status: 200 })
-  } catch (err: any) {
-    if (err.message === 'Aula não encontrada') {
-      return NextResponse.json({ error: err.message }, { status: 404 })
+  } catch (err: unknown) {
+    const message = getErrorMessage(err, 'Erro interno do servidor')
+    if (message === 'Aula não encontrada') {
+      return NextResponse.json({ error: message }, { status: 404 })
     }
     console.error('[PUT /api/fixa/[id]]', err)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
@@ -41,9 +44,10 @@ export const DELETE = withAuth(async (_req: NextRequest, _user, context: Context
     const { id } = await context.params
     await FixaService.deletar(id)
     return NextResponse.json({ message: 'Aula removida com sucesso' }, { status: 200 })
-  } catch (err: any) {
-    if (err.message === 'Aula não encontrada') {
-      return NextResponse.json({ error: err.message }, { status: 404 })
+  } catch (err: unknown) {
+    const message = getErrorMessage(err, 'Erro interno do servidor')
+    if (message === 'Aula não encontrada') {
+      return NextResponse.json({ error: message }, { status: 404 })
     }
     console.error('[DELETE /api/fixa/[id]]', err)
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })

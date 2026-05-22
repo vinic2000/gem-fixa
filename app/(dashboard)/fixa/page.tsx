@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { apiFetch } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { getErrorMessage } from '@/lib/errors'
 
 interface Aluno { id: string; nome: string; sobrenome: string }
 interface FixaRow {
@@ -60,7 +61,7 @@ export default function FixaPage() {
 
   // Busca sugestões de alunos conforme o usuário digita
   useEffect(() => {
-    if (searchAluno.trim().length < 2) { setAlunos([]); setShowSuggestions(false); return }
+    if (searchAluno.trim().length < 2) return
     const timer = setTimeout(async () => {
       try {
         const res = await apiFetch<{ data: Aluno[] }>(
@@ -84,8 +85,7 @@ export default function FixaPage() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  // Busca as fixas do aluno selecionado
-  const fetchFixas = useCallback(async () => {
+  async function fetchFixas() {
     if (!selectedAluno) return
     setLoadingFixas(true)
     try {
@@ -99,11 +99,43 @@ export default function FixaPage() {
       setFixas(res.data)
       setTotal(res.total)
       setTotalPages(res.totalPages)
-    } catch { setFixas([]) }
-    finally { setLoadingFixas(false) }
-  }, [selectedAluno, page, filtroTipo])
+    } catch {
+      setFixas([])
+    } finally {
+      setLoadingFixas(false)
+    }
+  }
 
-  useEffect(() => { fetchFixas() }, [fetchFixas])
+  useEffect(() => {
+    let isCancelled = false
+
+    async function loadFixas() {
+      if (!selectedAluno) return
+      setLoadingFixas(true)
+      try {
+        const params = new URLSearchParams({
+          aluno_id: selectedAluno.id,
+          page: String(page),
+          limit: String(LIMIT),
+        })
+        if (filtroTipo !== 'todos') params.set('tipo_aula', filtroTipo)
+        const res = await apiFetch<FixaResponse>(`/api/fixa?${params}`)
+        if (isCancelled) return
+        setFixas(res.data)
+        setTotal(res.total)
+        setTotalPages(res.totalPages)
+      } catch {
+        if (!isCancelled) setFixas([])
+      } finally {
+        if (!isCancelled) setLoadingFixas(false)
+      }
+    }
+
+    void loadFixas()
+    return () => {
+      isCancelled = true
+    }
+  }, [selectedAluno, page, filtroTipo])
 
   function selectAluno(a: Aluno) {
     setSelectedAluno(a)
@@ -121,8 +153,8 @@ export default function FixaPage() {
     try {
       await apiFetch(`/api/fixa/${id}`, { method: 'DELETE' })
       fetchFixas()
-    } catch (err: any) {
-      alert(err.message ?? 'Erro ao excluir')
+    } catch (err: unknown) {
+      alert(getErrorMessage(err, 'Erro ao excluir'))
     }
   }
 
@@ -151,8 +183,8 @@ export default function FixaPage() {
       })
       setModalOpen(false)
       fetchFixas()
-    } catch (err: any) {
-      setModalError(err.message ?? 'Erro ao salvar')
+    } catch (err: unknown) {
+      setModalError(getErrorMessage(err, 'Erro ao salvar'))
     } finally {
       setSavingFixa(false)
     }
@@ -200,7 +232,7 @@ export default function FixaPage() {
                 <button
                   key={a.id}
                   type="button"
-                  className="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-900 transition-colors border-b border-gray-50 last:border-0"
+                  className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-100 hover:text-gray-900 transition-colors border-b border-gray-50 last:border-0"
                   onMouseDown={() => selectAluno(a)}
                 >
                   {a.nome} {a.sobrenome}

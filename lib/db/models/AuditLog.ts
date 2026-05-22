@@ -15,7 +15,8 @@ export interface AuditLogAttributes {
   id: string
   data_acao: Date
   acao: TipoAcao
-  usuario_id: string
+  usuario_id: string | null
+  usuario_id_legado?: string | null
   entidade: string
   entidade_id?: string | null
   dados?: DadosEdicao | null
@@ -23,11 +24,10 @@ export interface AuditLogAttributes {
   updated_at?: Date
 }
 
-export interface AuditLogCreationAttributes
-  extends Optional<
-    AuditLogAttributes,
-    'id' | 'data_acao' | 'created_at' | 'updated_at'
-  > {}
+export type AuditLogCreationAttributes = Optional<
+  AuditLogAttributes,
+  'id' | 'data_acao' | 'created_at' | 'updated_at'
+>
 
 class AuditLog
   extends Model<AuditLogAttributes, AuditLogCreationAttributes>
@@ -36,7 +36,8 @@ class AuditLog
   declare id: string
   declare data_acao: Date
   declare acao: TipoAcao
-  declare usuario_id: string
+  declare usuario_id: string | null
+  declare usuario_id_legado: string | null
   declare entidade: string
   declare entidade_id: string | null
   declare dados: DadosEdicao | null
@@ -63,8 +64,12 @@ AuditLog.init(
     },
     usuario_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
       references: { model: 'pessoas', key: 'id' },
+    },
+    usuario_id_legado: {
+      type: DataTypes.UUID,
+      allowNull: true,
     },
     entidade: {
       type: DataTypes.STRING(100),

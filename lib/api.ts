@@ -38,7 +38,7 @@ async function tryRefresh(): Promise<string | null> {
   return data.accessToken
 }
 
-export async function apiFetch<T = any>(
+export async function apiFetch<T = unknown>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {

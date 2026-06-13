@@ -31,19 +31,19 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-gray-800 border border-gray-900 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
-            <Music className="w-7 h-7 text-white" />
+          <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
+            <Music className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Gem Fixa</h1>
           <p className="text-sm text-gray-500 mt-1">Sistema de controle de aulas musicais</p>
         </div>
 
-        <Card className="shadow-md">
-          <CardHeader>
-            <CardTitle>Entrar</CardTitle>
+        <Card className="shadow-sm border-gray-200">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg">Entrar</CardTitle>
             <CardDescription>Acesso exclusivo para instrutores</CardDescription>
           </CardHeader>
           <CardContent>
@@ -80,7 +80,7 @@ export default function LoginPage() {
                 </p>
               )}
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full mt-1" disabled={loading}>
                 {loading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>

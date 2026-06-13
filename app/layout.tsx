@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/lib/providers/auth-provider'
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'Gem Fixa',
@@ -9,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className="h-full" suppressHydrationWarning>
+    <html lang="pt-BR" className={`h-full ${inter.className}`} suppressHydrationWarning>
       <body className="h-full bg-gray-50" suppressHydrationWarning>
         <AuthProvider>{children}</AuthProvider>
       </body>

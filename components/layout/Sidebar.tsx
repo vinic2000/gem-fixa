@@ -33,30 +33,28 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-gray-900 text-white transition-transform duration-300',
-          // Desktop: sempre visível
+          'fixed top-0 left-0 z-40 flex w-60 flex-col bg-white border-r border-gray-200 transition-transform duration-300',
           'lg:translate-x-0',
-          // Mobile: controlado pelo estado
           open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
+        style={{ height: '100dvh' }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-700">
-          <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center shrink-0 border border-gray-700">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
             <Music className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold text-sm flex-1">Gem Fixa</span>
-          {/* Botão fechar — mobile only */}
+          <span className="font-semibold text-sm text-gray-900 flex-1">Gem Fixa</span>
           <button
             onClick={onClose}
-            className="lg:hidden p-1 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+            className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-0.5">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname.startsWith(href)
             return (
@@ -67,11 +65,11 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
                   active
-                    ? 'bg-gray-800 text-white border border-gray-700'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 )}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-indigo-600' : 'text-gray-400')} />
                 {label}
               </Link>
             )
@@ -79,18 +77,21 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-gray-700 px-3 py-4">
+        <div
+          className="shrink-0 border-t border-gray-100 px-3 py-3"
+          style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+        >
           <div className="px-3 py-2 mb-1">
-            <p className="text-xs text-gray-400">Conectado como</p>
-            <p className="text-sm font-medium text-white truncate">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Conectado como</p>
+            <p className="text-sm font-medium text-gray-900 truncate mt-0.5">
               {instrutor ? `${instrutor.nome} ${instrutor.sobrenome}` : '—'}
             </p>
           </div>
           <button
             onClick={logout}
-            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
           >
-            <LogOut className="w-4 h-4 shrink-0" />
+            <LogOut className="w-4 h-4 shrink-0 text-gray-400" />
             Sair
           </button>
         </div>

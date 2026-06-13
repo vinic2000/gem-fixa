@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { setTokens, clearTokens, getTokens } from '@/lib/api'
 
@@ -21,19 +21,21 @@ const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const [instrutor, setInstrutor] = useState<Instrutor | null>(() => {
-    if (typeof window === 'undefined') return null
+  const [instrutor, setInstrutor] = useState<Instrutor | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
     const { accessToken } = getTokens()
     const stored = localStorage.getItem('instrutor')
-    if (!accessToken || !stored) return null
-    try {
-      return JSON.parse(stored) as Instrutor
-    } catch {
-      clearTokens()
-      return null
+    if (accessToken && stored) {
+      try {
+        setInstrutor(JSON.parse(stored) as Instrutor)
+      } catch {
+        clearTokens()
+      }
     }
-  })
-  const [isLoading] = useState(false)
+    setIsLoading(false)
+  }, [])
 
   async function login(email: string, senha: string) {
     const res = await fetch('/api/auth/login', {

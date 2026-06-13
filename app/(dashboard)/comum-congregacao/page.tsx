@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { apiFetch } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ChevronLeft, ChevronRight, Search, PlusCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, PlusCircle, Church } from 'lucide-react'
 import { getErrorMessage } from '@/lib/errors'
 
 interface ComumCongregacao {
@@ -103,35 +103,44 @@ export default function ComumCongregacaoPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Nome</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Endereço</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Bairro</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Cidade</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">CEP</th>
+              <tr className="border-b border-gray-100 bg-gray-50/80">
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Endereço</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bairro</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Cidade</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">CEP</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr>
-                  <td colSpan={5} className="text-center py-12 text-gray-400">Carregando...</td>
-                </tr>
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan={5} className="px-4 py-3.5">
+                      <div className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: `${55 + (i % 3) * 15}%` }} />
+                    </td>
+                  </tr>
+                ))
               ) : congregacoes.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-gray-400">Nenhum registro encontrado</td>
+                  <td colSpan={5} className="text-center py-16">
+                    <div className="flex flex-col items-center gap-2 text-gray-400">
+                      <Church className="w-8 h-8 text-gray-300" />
+                      <span className="text-sm">Nenhum registro encontrado</span>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 congregacoes.map((c) => (
                   <tr
                     key={c.id}
                     onClick={() => router.push(`/comum-congregacao/${c.id}`)}
-                    className="border-b border-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900">{c.nome}</td>
-                    <td className="px-4 py-3 text-gray-600">{c.endereco ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{c.bairro ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{c.cidade ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{c.cep ?? '—'}</td>
+                    <td className="px-4 py-3.5 font-medium text-gray-900">{c.nome}</td>
+                    <td className="px-4 py-3.5 text-gray-500">{c.endereco ?? '—'}</td>
+                    <td className="px-4 py-3.5 text-gray-500">{c.bairro ?? '—'}</td>
+                    <td className="px-4 py-3.5 text-gray-500">{c.cidade ?? '—'}</td>
+                    <td className="px-4 py-3.5 text-gray-500">{c.cep ?? '—'}</td>
                   </tr>
                 ))
               )}
@@ -141,9 +150,9 @@ export default function ComumCongregacaoPage() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50/60">
             <p className="text-sm text-gray-500">
-              Página {page} de {totalPages}
+              Página <span className="font-medium text-gray-700">{page}</span> de {totalPages}
             </p>
             <div className="flex gap-1">
               <Button

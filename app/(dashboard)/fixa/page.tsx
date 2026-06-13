@@ -15,7 +15,7 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
+import { Plus, Trash2, ChevronLeft, ChevronRight, Loader2, BookOpen } from 'lucide-react'
 import { getErrorMessage } from '@/lib/errors'
 
 interface Aluno { id: string; nome: string; sobrenome: string }
@@ -266,51 +266,56 @@ export default function FixaPage() {
       {/* Tabela de fixas */}
       {selectedAluno && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/80 flex items-center justify-between">
             <span className="text-sm font-medium text-gray-700">
-              Aulas de <strong>{selectedAluno.nome} {selectedAluno.sobrenome}</strong>
+              Aulas de <strong className="text-gray-900">{selectedAluno.nome} {selectedAluno.sobrenome}</strong>
             </span>
-            <span className="text-xs text-gray-500">{total} {total === 1 ? 'registro' : 'registros'}</span>
+            <span className="text-xs text-gray-400 font-medium">{total} {total === 1 ? 'registro' : 'registros'}</span>
           </div>
 
           <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[420px]">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Data da aula</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Tipo</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Página</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Lição</th>
+              <tr className="border-b border-gray-100 bg-gray-50/50">
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Data da aula</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Página</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Lição</th>
                 <th className="px-4 py-3 w-12"></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {loadingFixas ? (
-                <tr>
-                  <td colSpan={5} className="text-center py-12 text-gray-400">
-                    <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-                  </td>
-                </tr>
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i}>
+                    <td colSpan={5} className="px-4 py-3.5">
+                      <div className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: `${50 + (i % 3) * 15}%` }} />
+                    </td>
+                  </tr>
+                ))
               ) : fixas.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-gray-400">
-                    Nenhuma aula registrada
+                  <td colSpan={5} className="text-center py-16">
+                    <div className="flex flex-col items-center gap-2 text-gray-400">
+                      <BookOpen className="w-8 h-8 text-gray-300" />
+                      <span className="text-sm">Nenhuma aula registrada</span>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 fixas.map((f) => (
-                  <tr key={f.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-gray-900">
+                  <tr key={f.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3.5 text-gray-900">
                       {new Date(f.data_aula + 'T00:00:00').toLocaleDateString('pt-BR')}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <Badge variant={f.tipo_aula === 'pratica' ? 'success' : 'secondary'}>
                         {f.tipo_aula === 'pratica' ? 'Prática' : 'Teórica'}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{f.numero_pagina ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-600">{f.numero_licao ?? '—'}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5 text-gray-500">{f.numero_pagina ?? '—'}</td>
+                    <td className="px-4 py-3.5 text-gray-500">{f.numero_licao ?? '—'}</td>
+                    <td className="px-4 py-3.5">
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <button className="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors">
@@ -341,8 +346,8 @@ export default function FixaPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
-              <p className="text-sm text-gray-500">Página {page} de {totalPages}</p>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50/60">
+              <p className="text-sm text-gray-500">Página <span className="font-medium text-gray-700">{page}</span> de {totalPages}</p>
               <div className="flex gap-1">
                 <Button variant="outline" size="icon" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
                   <ChevronLeft className="h-4 w-4" />
@@ -357,8 +362,9 @@ export default function FixaPage() {
       )}
 
       {!selectedAluno && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-48">
-          <p className="text-gray-400 text-sm">Busque um aluno para visualizar as aulas</p>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center h-48 gap-2 text-gray-400">
+          <BookOpen className="w-8 h-8 text-gray-300" />
+          <p className="text-sm">Busque um aluno para visualizar as aulas</p>
         </div>
       )}
 

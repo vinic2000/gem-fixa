@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex items-center justify-center bg-gray-50" style={{ minHeight: '100dvh' }}>
         <div className="text-gray-400 text-sm">Carregando...</div>
       </div>
     )
@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!instrutor) return null
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex bg-gray-50" style={{ height: '100dvh' }}>
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Área principal */}
@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gray-800 rounded-md border border-gray-700 flex items-center justify-center">
+            <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center">
               <Music className="w-3 h-3 text-white" />
             </div>
             <span className="font-semibold text-sm text-gray-900">Gem Fixa</span>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { UserPlus, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { UserPlus, ChevronLeft, ChevronRight, Search, Users } from 'lucide-react'
 import { getErrorMessage } from '@/lib/errors'
 
 interface Pessoa {
@@ -132,41 +132,50 @@ export default function PessoasPage() {
         <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[520px]">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Nome</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Tipo</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Instrumento</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Congregação</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Contato</th>
+            <tr className="border-b border-gray-100 bg-gray-50/80">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Instrumento</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Congregação</th>
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Contato</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-50">
             {loading ? (
-              <tr>
-                <td colSpan={5} className="text-center py-12 text-gray-400">Carregando...</td>
-              </tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td colSpan={5} className="px-4 py-3">
+                    <div className="h-4 bg-gray-100 rounded animate-pulse" style={{ width: `${60 + (i % 3) * 15}%` }} />
+                  </td>
+                </tr>
+              ))
             ) : pessoas.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-gray-400">Nenhum registro encontrado</td>
+                <td colSpan={5} className="text-center py-16">
+                  <div className="flex flex-col items-center gap-2 text-gray-400">
+                    <Users className="w-8 h-8 text-gray-300" />
+                    <span className="text-sm">Nenhum registro encontrado</span>
+                  </div>
+                </td>
               </tr>
             ) : (
               pessoas.map((p) => (
                 <tr
                   key={p.id}
                   onClick={() => router.push(`/pessoas/${p.id}`)}
-                  className="border-b border-gray-50 hover:bg-gray-100 cursor-pointer transition-colors"
+                  className="hover:bg-gray-50 cursor-pointer transition-colors"
                 >
-                  <td className="px-4 py-3 font-medium text-gray-900">
+                  <td className="px-4 py-3.5 font-medium text-gray-900">
                     {p.nome} {p.sobrenome}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3.5">
                     <Badge variant={p.tipo === 'instrutor' ? 'default' : 'secondary'}>
                       {p.tipo === 'instrutor' ? 'Instrutor' : 'Aluno'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{p.instrumento ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.comum_congregacao?.nome ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.celular ?? p.telefone ?? '—'}</td>
+                  <td className="px-4 py-3.5 text-gray-500">{p.instrumento ?? '—'}</td>
+                  <td className="px-4 py-3.5 text-gray-500">{p.comum_congregacao?.nome ?? '—'}</td>
+                  <td className="px-4 py-3.5 text-gray-500">{p.celular ?? p.telefone ?? '—'}</td>
                 </tr>
               ))
             )}
@@ -176,9 +185,9 @@ export default function PessoasPage() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50/60">
             <p className="text-sm text-gray-500">
-              Página {page} de {totalPages}
+              Página <span className="font-medium text-gray-700">{page}</span> de {totalPages}
             </p>
             <div className="flex gap-1">
               <Button

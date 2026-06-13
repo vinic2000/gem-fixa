@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { AuditLog, Fixa, LoginLog, Pessoa, PessoaAttributes } from '@/lib/db/models'
+import { AuditLog, ComumCongregacao, Fixa, LoginLog, Pessoa, PessoaAttributes } from '@/lib/db/models'
 import { registrarAudit, calcularDiff } from './log.service'
 
 type CriarPessoaDTO = Omit<PessoaAttributes, 'id' | 'created_at' | 'updated_at'> & { senha?: string }
@@ -21,7 +21,10 @@ export const PessoaService = {
    * Busca pessoa pelo ID. Audita como 'consulta'.
    */
   async buscarPorId(id: string, usuarioId: string): Promise<Pessoa> {
-    const pessoa = await Pessoa.findByPk(id)
+    const pessoa = await Pessoa.findByPk(id, {
+      attributes: { exclude: ['senha_hash'] },
+      include: [{ model: ComumCongregacao, as: 'comum_congregacao', attributes: ['id', 'nome'] }],
+    })
 
     if (!pessoa) throw new Error('Pessoa não encontrada')
 

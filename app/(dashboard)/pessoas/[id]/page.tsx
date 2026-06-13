@@ -14,6 +14,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { CongregacaoCombobox } from '@/components/ui/congregacao-combobox'
 import { ArrowLeft, Save, Loader2, Trash2 } from 'lucide-react'
 import { getErrorMessage } from '@/lib/errors'
 
@@ -29,17 +30,34 @@ interface PessoaForm {
   bairro: string
   cidade: string
   cep: string
-  comum_congregacao: string
+  comum_congregacao_id: string
+  comum_congregacao_nome: string
   instrumento: string
   senha: string
 }
 
-type PessoaApiResponse = Omit<PessoaForm, 'senha'>
+interface PessoaApiResponse {
+  nome: string
+  sobrenome: string
+  tipo: string
+  email: string | null
+  responsavel: string | null
+  telefone: string | null
+  celular: string | null
+  endereco: string | null
+  bairro: string | null
+  cidade: string | null
+  cep: string | null
+  instrumento: string | null
+  comum_congregacao_id: string | null
+  comum_congregacao: { id: string; nome: string } | null
+}
 
 const EMPTY: PessoaForm = {
   nome: '', sobrenome: '', tipo: 'aluno', email: '',
   responsavel: '', telefone: '', celular: '', endereco: '',
-  bairro: '', cidade: '', cep: '', comum_congregacao: '',
+  bairro: '', cidade: '', cep: '',
+  comum_congregacao_id: '', comum_congregacao_nome: '',
   instrumento: '', senha: '',
 }
 
@@ -71,7 +89,8 @@ export default function PessoaFormPage() {
           bairro:            p.bairro            ?? '',
           cidade:            p.cidade            ?? '',
           cep:               p.cep               ?? '',
-          comum_congregacao: p.comum_congregacao ?? '',
+          comum_congregacao_id:   p.comum_congregacao_id   ?? '',
+          comum_congregacao_nome: p.comum_congregacao?.nome ?? '',
           instrumento:       p.instrumento       ?? '',
           senha: '',
         })
@@ -103,13 +122,15 @@ export default function PessoaFormPage() {
     setSuccess('')
     setSaving(true)
     try {
-      const payload: Record<string, string> = { ...form }
-      // Não envia email na edição (imutável após cadastro)
-      if (!isNovo) delete payload.email
-      // Só envia senha se preenchida
-      if (!payload.senha) delete payload.senha
+      const { comum_congregacao_nome: _nome, senha: senhaRaw, email: _email, ...base } = form
+      const payload: Record<string, unknown> = {
+        ...base,
+        comum_congregacao_id: base.comum_congregacao_id || null,
+      }
+      if (senhaRaw) payload.senha = senhaRaw
 
       if (isNovo) {
+        payload.email = form.email
         await apiFetch('/api/pessoas', { method: 'POST', body: JSON.stringify(payload) })
         setSuccess('Pessoa cadastrada com sucesso!')
         setTimeout(() => router.push('/pessoas'), 1200)
@@ -263,8 +284,17 @@ export default function PessoaFormPage() {
               <Input id="cep" value={form.cep} onChange={(e) => handleChange('cep', e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="comum_congregacao">Congregação</Label>
-              <Input id="comum_congregacao" value={form.comum_congregacao} onChange={(e) => handleChange('comum_congregacao', e.target.value)} />
+              <Label>Congregação</Label>
+              <CongregacaoCombobox
+                selectedId={form.comum_congregacao_id}
+                selectedNome={form.comum_congregacao_nome}
+                onSelect={(id, nome) =>
+                  setForm((prev) => ({ ...prev, comum_congregacao_id: id, comum_congregacao_nome: nome }))
+                }
+                onClear={() =>
+                  setForm((prev) => ({ ...prev, comum_congregacao_id: '', comum_congregacao_nome: '' }))
+                }
+              />
             </div>
           </CardContent>
         </Card>

@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/providers/auth-provider'
 import { cn } from '@/lib/utils'
-import { Users, BookOpen, Music, LogOut, X } from 'lucide-react'
+import { Users, BookOpen, Music, LogOut, X, Church } from 'lucide-react'
 
 const navItems = [
-  { href: '/pessoas', label: 'Pessoas', icon: Users },
-  { href: '/fixa',   label: 'Fixas',   icon: BookOpen },
+  { href: '/pessoas',            label: 'Pessoas',      icon: Users },
+  { href: '/fixa',               label: 'Fixas',        icon: BookOpen },
+  { href: '/comum-congregacao',  label: 'Congregações', icon: Church },
 ]
 
 interface SidebarProps {

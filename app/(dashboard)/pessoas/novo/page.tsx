@@ -10,20 +10,24 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CongregacaoCombobox } from '@/components/ui/congregacao-combobox'
 import { ArrowLeft, Save, Loader2 } from 'lucide-react'
 import { getErrorMessage } from '@/lib/errors'
 
 interface PessoaForm {
   nome: string; sobrenome: string; tipo: string; email: string
   responsavel: string; telefone: string; celular: string; endereco: string
-  bairro: string; cidade: string; cep: string; comum_congregacao: string
+  bairro: string; cidade: string; cep: string
+  comum_congregacao_id: string
+  comum_congregacao_nome: string
   instrumento: string; senha: string
 }
 
 const EMPTY: PessoaForm = {
   nome: '', sobrenome: '', tipo: 'aluno', email: '', responsavel: '',
   telefone: '', celular: '', endereco: '', bairro: '', cidade: '', cep: '',
-  comum_congregacao: '', instrumento: '', senha: '',
+  comum_congregacao_id: '', comum_congregacao_nome: '',
+  instrumento: '', senha: '',
 }
 
 export default function NovaPessoaPage() {
@@ -43,8 +47,12 @@ export default function NovaPessoaPage() {
     setSuccess('')
     setSaving(true)
     try {
-      const payload: Record<string, string> = { ...form }
-      if (!payload.senha) delete payload.senha
+      const { comum_congregacao_nome: _nome, senha: senhaRaw, ...base } = form
+      const payload: Record<string, unknown> = {
+        ...base,
+        comum_congregacao_id: base.comum_congregacao_id || null,
+      }
+      if (senhaRaw) payload.senha = senhaRaw
       await apiFetch('/api/pessoas', { method: 'POST', body: JSON.stringify(payload) })
       setSuccess('Pessoa cadastrada com sucesso!')
       setTimeout(() => router.push('/pessoas'), 1200)
@@ -139,7 +147,12 @@ export default function NovaPessoaPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Congregação</Label>
-              <Input value={form.comum_congregacao} onChange={(e) => set('comum_congregacao', e.target.value)} />
+              <CongregacaoCombobox
+                selectedId={form.comum_congregacao_id}
+                selectedNome={form.comum_congregacao_nome}
+                onSelect={(id, nome) => setForm((prev) => ({ ...prev, comum_congregacao_id: id, comum_congregacao_nome: nome }))}
+                onClear={() => setForm((prev) => ({ ...prev, comum_congregacao_id: '', comum_congregacao_nome: '' }))}
+              />
             </div>
           </CardContent>
         </Card>

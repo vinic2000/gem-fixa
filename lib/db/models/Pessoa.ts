@@ -15,10 +15,10 @@ export interface PessoaAttributes {
   bairro?: string | null
   cidade?: string | null
   cep?: string | null
-  comum_congregacao?: string | null
   instrumento?: string | null
   email?: string | null
   senha_hash?: string | null
+  comum_congregacao_id?: string | null
   created_at?: Date
   updated_at?: Date
 }
@@ -43,10 +43,10 @@ class Pessoa
   declare bairro: string | null
   declare cidade: string | null
   declare cep: string | null
-  declare comum_congregacao: string | null
   declare instrumento: string | null
   declare email: string | null
   declare senha_hash: string | null
+  declare comum_congregacao_id: string | null
   declare readonly created_at: Date
   declare readonly updated_at: Date
 }
@@ -81,7 +81,6 @@ Pessoa.init(
     bairro: { type: DataTypes.STRING(100), allowNull: true },
     cidade: { type: DataTypes.STRING(100), allowNull: true },
     cep: { type: DataTypes.STRING(10), allowNull: true },
-    comum_congregacao: { type: DataTypes.STRING(150), allowNull: true },
     instrumento: { type: DataTypes.STRING(100), allowNull: true },
     email: {
       type: DataTypes.STRING(255),
@@ -90,6 +89,10 @@ Pessoa.init(
       validate: { isEmail: true },
     },
     senha_hash: { type: DataTypes.STRING(255), allowNull: true },
+    comum_congregacao_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
   },
   {
     sequelize,

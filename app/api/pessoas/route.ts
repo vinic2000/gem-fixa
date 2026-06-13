@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Op, WhereOptions } from 'sequelize'
 import { withAuth } from '@/lib/middleware/auth'
 import { PessoaService } from '@/services/pessoa.service'
-import { Pessoa, PessoaAttributes } from '@/lib/db/models'
+import { ComumCongregacao, Pessoa, PessoaAttributes } from '@/lib/db/models'
 
 // GET /api/pessoas?page=1&limit=10&tipo=aluno&search=nome
 export const GET = withAuth(async (req: NextRequest, user) => {
@@ -32,6 +32,7 @@ export const GET = withAuth(async (req: NextRequest, user) => {
       offset,
       order: [['nome', 'ASC'], ['sobrenome', 'ASC']],
       attributes: { exclude: ['senha_hash'] },
+      include: [{ model: ComumCongregacao, as: 'comum_congregacao', attributes: ['id', 'nome'] }],
     })
 
     // Auditoria apenas em listagem sem busca de autocomplete

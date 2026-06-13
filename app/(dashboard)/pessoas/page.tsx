@@ -19,7 +19,7 @@ interface Pessoa {
   telefone: string | null
   email: string | null
   instrumento: string | null
-  comum_congregacao: string | null
+  comum_congregacao: { id: string; nome: string } | null
 }
 
 interface PessoasResponse {
@@ -165,7 +165,7 @@ export default function PessoasPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-gray-600">{p.instrumento ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.comum_congregacao ?? '—'}</td>
+                  <td className="px-4 py-3 text-gray-600">{p.comum_congregacao?.nome ?? '—'}</td>
                   <td className="px-4 py-3 text-gray-600">{p.celular ?? p.telefone ?? '—'}</td>
                 </tr>
               ))

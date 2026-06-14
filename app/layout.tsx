@@ -6,7 +6,7 @@ import { AuthProvider } from '@/lib/providers/auth-provider'
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'Gem Fixa',
+  title: 'GEM-FIXA',
   description: 'Sistema de controle de aulas musicais',
 }
 

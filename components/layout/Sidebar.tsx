@@ -44,7 +44,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
             <Music className="w-4 h-4 text-white" />
           </div>
-          <span className="font-semibold text-sm text-gray-900 flex-1">Gem Fixa</span>
+          <span className="font-semibold text-sm text-gray-900 flex-1">GEM-FIXA</span>
           <button
             onClick={onClose}
             className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
